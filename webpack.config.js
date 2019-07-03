@@ -15,33 +15,28 @@ const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+// environment
+process.env.NODE_ENV = true ? 'development' : 'production'
 // webpack init
 const happyThreadPool = HappyPack.ThreadPool({
   size: os.cpus().length
 })
 // function declare
 const utils = {
-  getCrtPath: path => {
-    return path.join(__dirname, path)
+  getCrtPath: relativePath => {
+    return path.join(__dirname, relativePath)
   }
 }
 function createStyleUseObject (isModule = true) {
   return [
-    {
-      loader: MiniCssExtractPlugin.loader
-    },
-		// {
-		//   loader: 'style-loader'
-		// },
+		{ loader: MiniCssExtractPlugin.loader },
     {
       loader: 'css-loader',
       query: isModule
 				? { modules: true, localIdentName: '[name]__[local]___[hash:base64:5]' }
 				: { modules: false }
     },
-    {
-      loader: 'less-loader'
-    }
+		{ loader: 'less-loader' }
   ]
 }
 // variables declare
@@ -49,18 +44,20 @@ var babelrc = {
   presets: ['react-app', 'es2017'],
   plugins: ['transform-decorators-legacy', 'transform-class-properties']
 }
+var entryobj = {}
 var htmlPlugins = []
 var distdir = utils.getCrtPath('dist')
-
 // html basic add index page
-var indexHtmlPath = utils.getCrtPath('./index/index.html')
+var indexHtmlPath = utils.getCrtPath('./pages/index/index.html')
 var chunkName = 'index'
-var indexPagePlugin = new HtmlWebpackPlugin({
+var indexPageArg = {
   template: indexHtmlPath,
-  filename: indexHtmlPath,
+  filename: utils.getCrtPath(`./dist/index/index.html`),
   chunks: [chunkName]
-})
+}
+var indexPagePlugin = new HtmlWebpackPlugin(indexPageArg)
 htmlPlugins.push(indexPagePlugin)
+entryobj[chunkName] = utils.getCrtPath('./pages/index/index.js')
 
 var webpackConfig = {
   entry: entryobj,
@@ -80,7 +77,7 @@ var webpackConfig = {
       }),
       new HappyPack({
         id: 'happybabel',
-        loaders: ['ts-loader', 'babel-loader', 'xml-loader'],
+        loaders: ['babel-loader', 'xml-loader'],
         threadPool: happyThreadPool,
         verbose: true
       })
@@ -91,24 +88,10 @@ var webpackConfig = {
 	),
   output: {
     filename: '[name].[contenthash].js',
-    publicPath: './',
+    publicPath: '../',
     path: distdir
   },
   optimization: {},
-	// devServer: {
-	//     inline: true,
-	//     // after() {
-	//     //     console.log('after now');
-	//     // },
-	//     hot: true,
-	//     inline: true,
-	//     progress: true,
-	//     // proxy: proxyobj,
-	//     publicPath: '/',
-	//     // contentBase: path.join(__dirname, 'dist'),
-	//     compress: true,
-	//     port: 1234
-	// },
   module: {
     rules: [
       {
@@ -171,4 +154,5 @@ var webpackConfig = {
     ]
   }
 }
-module.exprots = webpackConfig
+
+module.exports = webpackConfig
