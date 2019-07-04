@@ -47,112 +47,130 @@ var babelrc = {
 var entryobj = {}
 var htmlPlugins = []
 var distdir = utils.getCrtPath('dist')
-// html basic add index page
-var indexHtmlPath = utils.getCrtPath('./pages/index/index.html')
-var chunkName = 'index'
-var indexPageArg = {
-  template: indexHtmlPath,
-  filename: utils.getCrtPath(`./dist/index/index.html`),
-  chunks: [chunkName]
-}
-var indexPagePlugin = new HtmlWebpackPlugin(indexPageArg)
-htmlPlugins.push(indexPagePlugin)
-entryobj[chunkName] = utils.getCrtPath('./pages/index/index.js')
+// add page by read dir
+var pagesPath = utils.getCrtPath('./pages')
+var pagesArr = fs.readdirSync(pagesPath)
+_.forEach(pagesArr, eachPage => {
+  var chunkName = 'index'
+  var indexHtmlPath = utils.getCrtPath(`./pages/${chunkName}/index.html`)
+  var indexPageArg = {
+    template: indexHtmlPath,
+    filename: utils.getCrtPath(`./dist/${chunkName}/index.html`),
+    chunks: [chunkName]
+  }
+  var indexPagePlugin = new HtmlWebpackPlugin(indexPageArg)
+  htmlPlugins.push(indexPagePlugin)
+  entryobj[chunkName] = utils.getCrtPath(`./pages/${chunkName}/index.js`)
+})
 
-var webpackConfig = {
-  entry: entryobj,
-  resolve: {
-    extensions: ['.js', '.vue', '.json', '.ts'],
-    alias: {}
-  },
-  plugins: _.filter(
-    [
-      new VueLoaderPlugin(),
-      new CleanWebpackPlugin([distdir], {
-        allowExternal: true
-      }),
-      ...htmlPlugins,
-      new MiniCssExtractPlugin({
-        filename: '[name].[contenthash].css'
-      }),
-      new HappyPack({
-        id: 'happybabel',
-        loaders: ['babel-loader', 'xml-loader'],
-        threadPool: happyThreadPool,
-        verbose: true
-      })
-    ],
-		(x, d, n) => {
+module.exports = mode => {
+  var isDev = mode === 'dev'
+  var contentHashValue = isDev ? 'hash' : 'contenthash'
+  var webpackConfig = {
+    devServer: {
+      inline: true,
+      hot: true,
+      inline: true,
+      progress: true,
+      publicPath: '/',
+      contentBase: utils.getCrtPath('dist'),
+      compress: true,
+      port: 1234
+    },
+    entry: entryobj,
+    resolve: {
+      extensions: ['.js', '.vue', '.json', '.ts'],
+      alias: {}
+    },
+    plugins: _.filter(
+      [
+        new VueLoaderPlugin(),
+        new CleanWebpackPlugin([distdir], {
+          allowExternal: true
+        }),
+        ...htmlPlugins,
+        new MiniCssExtractPlugin({
+          filename: '[name].[' + contentHashValue + '].css'
+        }),
+        new HappyPack({
+          id: 'happybabel',
+          loaders: ['babel-loader', 'xml-loader'],
+          threadPool: happyThreadPool,
+          verbose: true
+        })
+      ],
+			(x, d, n) => {
   return !_.isNil(x)
 }
-	),
-  output: {
-    filename: '[name].[contenthash].js',
-    publicPath: '../',
-    path: distdir
-  },
-  optimization: {},
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader'
-      },
-      {
-        test: /\.(ts|tsx)$/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: babelrc
-          },
-          {
-            loader: 'ts-loader'
-          }
-        ]
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
-          {
-            loader: 'css-loader'
-          }
-        ]
-      },
-      {
-        test: /\.less$/,
-        exclude: /antd/,
-        use: createStyleUseObject()
-      },
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /(node_modules|bower_components|link_react)/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: babelrc
-          }
-        ]
-      },
-      {
-        test: /\.(png|svg|jpg|gif|jpeg)$/,
-        use: ['file-loader']
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '../[name].[ext]'
+		),
+    output: {
+      filename: '[name].[' + contentHashValue + '].js',
+      publicPath: '../',
+      path: distdir
+    },
+    optimization: {},
+    module: {
+      rules: [
+        {
+          test: /\.vue$/,
+          loader: 'vue-loader'
+        },
+        {
+          test: /\.(ts|tsx)$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: babelrc
+            },
+            {
+              loader: 'ts-loader'
             }
-          }
-        ]
-      }
-    ]
+          ]
+        },
+        {
+          test: /\.css$/,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader
+            },
+            {
+              loader: 'css-loader'
+            }
+          ]
+        },
+        {
+          test: /\.less$/,
+          exclude: /antd/,
+          use: createStyleUseObject()
+        },
+        {
+          test: /\.(js|jsx)$/,
+          exclude: /(node_modules|bower_components|link_react)/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: babelrc
+            }
+          ]
+        },
+        {
+          test: /\.(png|svg|jpg|gif|jpeg)$/,
+          use: ['file-loader']
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '../[name].[ext]'
+              }
+            }
+          ]
+        }
+      ]
+    }
   }
-}
 
-module.exports = webpackConfig
+  return webpackConfig
+}
