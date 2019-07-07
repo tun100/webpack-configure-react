@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx webpack-dev-server --config ./webpack.dev.config.js --progress --profile --colors --watch --mode development",
     "dist": "npx webpack --config ./webpack.prod.config.js --progres --profile --colors --mode production"
   },
