@@ -15,8 +15,6 @@ const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-// environment
-process.env.NODE_ENV = true ? 'development' : 'production'
 // webpack init
 const happyThreadPool = HappyPack.ThreadPool({
   size: os.cpus().length
@@ -62,6 +60,8 @@ _.forEach(pagesArr, eachPage => {
 
 module.exports = mode => {
   var isDev = mode === 'dev'
+  // environment
+  process.env.NODE_ENV = isDev ? 'development' : 'production'
   var contentHashValue = isDev ? 'hash' : 'contenthash'
   var webpackConfig = {
     devServer: {
