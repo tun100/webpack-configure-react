@@ -45,7 +45,7 @@ var distdir = utils.getCrtPath('dist')
 var pagesPath = utils.getCrtPath('./pages')
 var pagesArr = fs.readdirSync(pagesPath)
 _.forEach(pagesArr, eachPage => {
-  var chunkName = 'index'
+  var chunkName = eachPage
   var indexHtmlPath = utils.getCrtPath(`./pages/${chunkName}/index.html`)
   var indexPageArg = {
     template: indexHtmlPath,
