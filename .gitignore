@@ -22,9 +22,6 @@ projectcore/*
 .env.test.local
 .env.production.local
 
-*.prod.js
-*.prod.*.js
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
