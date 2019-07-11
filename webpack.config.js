@@ -37,7 +37,7 @@ function createStyleUseObject (isModule = true) {
   ]
 }
 // variables declare
-var babelrc = fs.readFileSync(utils.getCrtPath('.babelrc'),'UTF-8');
+var babelrc = fs.readFileSync(utils.getCrtPath('.babelrc'), 'UTF-8')
 var entryobj = {}
 var htmlPlugins = []
 var distdir = utils.getCrtPath('dist')
@@ -56,17 +56,21 @@ _.forEach(pagesArr, eachPage => {
   htmlPlugins.push(indexPagePlugin)
   entryobj[chunkName] = utils.getCrtPath(`./pages/${chunkName}/index.js`)
 })
-if(entryobj['index']){
-  htmlPlugins.push(new HtmlWebpackPlugin(
-    template: utils.getCrtPath(`./pages/index/index.html`),
-    filename: utils.getCrtPath(`./dist/index.html`),
-    chunks: ['index']
-  }))
+if (entryobj['index']) {
+  htmlPlugins.push(
+		new HtmlWebpackPlugin({
+  template: utils.getCrtPath(`./pages/index/index.html`),
+  filename: utils.getCrtPath(`./dist/index.html`),
+  chunks: ['index']
+})
+	)
 }
+
+var configureWebpack = require('./config/configureWebpack');
 
 module.exports = mode => {
   var isDev = mode === 'dev'
-  // environment
+	// environment
   process.env.NODE_ENV = isDev ? 'development' : 'production'
   var contentHashValue = isDev ? 'hash' : 'contenthash'
   var webpackConfig = {
@@ -175,5 +179,5 @@ module.exports = mode => {
     }
   }
 
-  return webpackConfig
+  return configureWebpack(webpackConfig,mode);
 }
