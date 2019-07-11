@@ -57,7 +57,7 @@ _.forEach(pagesArr, eachPage => {
   entryobj[chunkName] = utils.getCrtPath(`./pages/${chunkName}/index.js`)
 })
 if(entryobj['index']){
-  htmlPlugins.push(new HtmlWebpackPlugin({
+  htmlPlugins.push(new HtmlWebpackPlugin(
     template: utils.getCrtPath(`./pages/index/index.html`),
     filename: utils.getCrtPath(`./dist/index.html`),
     chunks: ['index']
