@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "server": "npx nodemon ./server/index.js",
     "dev": "npx webpack-dev-server --config ./webpack.dev.config.js --progress --profile --colors --watch --mode development",
     "dist": "npx webpack --config ./webpack.prod.config.js --progres --profile --colors --mode production"
   },
@@ -17,10 +18,12 @@
     "babel-preset-vue-app": "^2.0.0",
     "babel-runtime": "^6.26.0",
     "babel-traverse": "^6.26.0",
+    "koa": "^2.7.0",
     "lodash": "^4.17.11",
     "mini-css-extract-plugin": "^0.5.0",
     "mobx": "^5.11.0",
     "mobx-react": "^6.1.1",
+    "nodemon": "^1.19.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router": "^5.0.1",
